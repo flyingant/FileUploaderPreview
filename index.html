@@ -1,0 +1,77 @@
+<!--
+
+This works on chrome ,firefox
+
+some comments wait to add
+
+-->
+
+<!DOCTYPE>
+<html>
+<head>
+    <title>Preview the Upload File before upload</title>
+</head>
+<body style="text-align: center;">
+
+<input id="file" type="file">
+
+<br/>
+<br/>
+
+<canvas id="canvas" width="800" height="600" style="border: 1px solid">
+
+</canvas>
+
+</body>
+<script>
+    window.onload = function(){
+        var file = document.getElementById("file");
+        file.addEventListener("change", function(event){
+            handleFile(event.target.files[0], "canvas");
+            return false
+        })
+    }
+
+    /*
+     this function is help to load the file to canvas with the canvas' width and canvas' height
+     and the canvas will automatically resize the image to canvas' size in order to make image uploaded looks more friendly
+      */
+    function handleFile(file, canvasId){
+
+        //file name 'file.name'
+        //file mine type 'file.type'
+        //file size 'file.size'
+
+        var fileReader = new FileReader();
+        fileReader.onload = function (oFREvent) {
+            var img = new Image();
+            img.onload = function () {
+                var canvas = document.getElementById(canvasId);
+                var ctx = canvas.getContext('2d');
+                var canvasWidth = canvas.width;
+                var canvasHeight = canvas.height;
+                var imageWidth = img.width;
+                var imageHeight = img.height;
+
+                var scaleWidth = imageWidth < imageHeight;
+                var scale = 1;
+                if (scaleWidth) {
+                    scale = canvasWidth / imageWidth;
+                } else {
+                    scale = canvasHeight / imageHeight;
+                }
+                var newImageWidth = imageWidth * scale;
+                var newImageHeight = imageHeight * scale;
+                var x = (canvasWidth - newImageWidth) / 2;
+                var y = (canvasHeight - newImageHeight) / 2;
+
+                ctx.drawImage(img, 0, 0, imageWidth, imageHeight, x, y, newImageWidth, newImageHeight);
+                //image result is 'canvas.toDataURL()' with base64 code
+            }
+            img.src = oFREvent.target.result;
+        }
+        var file = file;
+        fileReader.readAsDataURL(file);
+    }
+</script>
+</html>
