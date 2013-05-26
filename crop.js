@@ -7,9 +7,13 @@ var canvasCrop = {
     getCanvas: function(){
         return document.getElementById(this.canvasId)
     },
-
-    getImage: function(){
-        return this.image;
+    
+    getOriginImage: function(){
+        return this.originImage    
+    },
+    
+    getCurrentImage: function(){
+        return this.currentImage    
     },
 
     selecting: false,
@@ -29,11 +33,12 @@ var canvasCrop = {
         file.addEventListener("change", function(event){
             var fileReader = new FileReader();
             fileReader.onload = function(event){
-                self.image = new Image();
-                self.image.onload = function () {
+                self.originImage = new Image();
+                self.originImage.onload = function () {
                     self.fillCanvas();
                 }
-                self.image.src = event.target.result;
+                self.originImage.src = event.target.result;
+                
             };
             fileReader.readAsDataURL(event.target.files[0]);
         }, false);
@@ -41,7 +46,7 @@ var canvasCrop = {
 
     fillCanvas: function(){
         var canvas = this.getCanvas();
-        var img = this.getImage();
+        var img = this.getOriginImage();
         var canvasWidth = canvas.width;
         var canvasHeight = canvas.height;
         var imageWidth = img.width;
@@ -60,8 +65,9 @@ var canvasCrop = {
         var y = (canvasHeight - newImageHeight) / 2;
 
         var ctx = this.getCanvas().getContext('2d');
-        ctx.drawImage(this.getImage(), 0, 0, imageWidth, imageHeight, x, y, newImageWidth, newImageHeight);
-
+        ctx.drawImage(this.getOriginImage(), 0, 0, imageWidth, imageHeight, x, y, newImageWidth, newImageHeight);
+        this.currentImage = new Image();
+        this.currentImage.src = canvas.toDataURL();
     },
 
     enableCrop: function(){
@@ -91,8 +97,8 @@ var canvasCrop = {
 
     mouseDownHandle: function(event, reference){
         reference.selecting = true;
-        reference.selectRectangle.x = event.offsetX - reference.getImage().offsetLeft;
-        reference.selectRectangle.y = event.offsetY - reference.getImage().offsetTop;
+        reference.selectRectangle.x = event.offsetX - reference.getCurrentImage().offsetLeft;
+        reference.selectRectangle.y = event.offsetY - reference.getCurrentImage().offsetTop;
         console.log("Begin select rectangle is:",reference.selectRectangle);
     },
 
@@ -104,7 +110,7 @@ var canvasCrop = {
     mouseMoveHandle: function(event, reference){
         if(reference.selecting){
             var canvas = reference.getCanvas();
-            var img = reference.getImage();
+            var img = reference.getCurrentImage();
             var canvasWidth = canvas.width;
             var canvasHeight = canvas.height;
             var imageWidth = img.width;
@@ -123,8 +129,8 @@ var canvasCrop = {
             var ctx = reference.getCanvas().getContext('2d');
             reference.fillCanvas();
             ctx.fillStyle = 'rgba( 0,0,0,0.8)';
-            reference.selectRectangle.x1 = event.offsetX - reference.getImage().offsetLeft - reference.selectRectangle.x;
-            reference.selectRectangle.y1 = event.offsetY - reference.getImage().offsetTop - reference.selectRectangle.y;
+            reference.selectRectangle.x1 = event.offsetX - reference.getCurrentImage().offsetLeft - reference.selectRectangle.x;
+            reference.selectRectangle.y1 = event.offsetY - reference.getCurrentImage().offsetTop - reference.selectRectangle.y;
 
             ctx.fillRect( 0, 0, reference.selectRectangle.x, newImageHeight );
             ctx.fillRect( reference.selectRectangle.x + reference.selectRectangle.x1, 0, newImageWidth - reference.selectRectangle.x1, newImageHeight );
@@ -135,8 +141,17 @@ var canvasCrop = {
 
     crop: function(){
         var canvas = this.getCanvas();
-        var img = this.getImage();
-
+        var img = this.getCurrentImage();
+        
+        canvas.width = this.selectRectangle.x1;
+        canvas.height = this.selectRectangle.y1;
+        
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(this.getCurrentImage(), 
+        this.selectRectangle.x, this.selectRectangle.y,
+        this.selectRectangle.x1, this.selectRectangle.y1,
+        0, 0,
+        this.selectRectangle.x1, this.selectRectangle.y1)
     }
 
 
