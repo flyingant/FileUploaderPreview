@@ -1,11 +1,3 @@
-<!--
-
-This works on chrome ,firefox
-
-some comments wait to add
-
--->
-
 <!DOCTYPE>
 <html>
 <head>
@@ -73,48 +65,6 @@ Please select a picture file and then select an area:
                 var mouseDown = false;
                 var mouseStart = false;
                 //image result is 'canvas.toDataURL()' with base64 code
-                canvas.addEventListener("mousedown", function(event){
-                    console.log("Mouse Start at X="+event.offsetX+" Y="+event.offsetY);
-                    mouseStart = true;
-                    mouseDown = false;
-                    startX = event.offsetX - img.offsetLeft;
-                    startY = event.offsetY - img.offsetTop;
-                }, false);
-
-                canvas.addEventListener("mouseup", function(event){
-                    mouseDown = true;
-                    mouseStart = false;
-                    console.log("Mouse End at X="+event.offsetX+" Y="+event.offsetY);
-                    console.log("The Select Area is:",{
-                        x: startX,
-                        y: startY,
-                        x1: event.offsetX - img.offsetLeft - startX,
-                        y1: event.offsetY - img.offsetTop - startY
-                    });
-
-                    canvas.width = event.offsetX - img.offsetLeft - startX;
-                    canvas.height = event.offsetY - img.offsetTop - startY;
-                    ctx.drawImage(
-                            img, startX, startY, event.offsetX - img.offsetLeft - startX, event.offsetY - img.offsetTop - startY, 0, 0, event.offsetX - img.offsetLeft - startX, event.offsetY - img.offsetTop - startY
-                    );
-                }, false);
-
-                canvas.addEventListener("mousemove", function(event){
-                    if(mouseStart && !mouseDown){
-                        ctx.drawImage(img, 0, 0, imageWidth, imageHeight, x, y, newImageWidth, newImageHeight);
-                        ctx.fillStyle = 'rgba( 0,0,0,0.8)';
-                        var rect = {
-                            x: startX,
-                            y: startY,
-                            x1: event.offsetX - img.offsetLeft - startX,
-                            y1: event.offsetY - img.offsetTop - startY
-                        };
-                        ctx.fillRect( 0, 0, rect.x, newImageHeight );
-                        ctx.fillRect( rect.x + rect.x1, 0, newImageWidth - rect.x1, newImageHeight );
-                        ctx.fillRect( rect.x, 0, rect.x1, rect.y );
-                        ctx.fillRect( rect.x, rect.y+rect.y1, rect.x1, newImageHeight - rect.y1 );
-                    }
-                }, false);
             }
             img.src = oFREvent.target.result;
         }
